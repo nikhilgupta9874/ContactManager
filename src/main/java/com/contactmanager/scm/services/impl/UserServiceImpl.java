@@ -6,9 +6,11 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.contactmanager.scm.entities.User;
+import com.contactmanager.scm.helpers.AppConstants;
 import com.contactmanager.scm.helpers.ResourceNotFoundException;
 import com.contactmanager.scm.repositories.UserRepo;
 import com.contactmanager.scm.services.UserService;
@@ -21,11 +23,15 @@ public class UserServiceImpl implements UserService{
     
     private Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Override
     public User saveUser(User user) {
         String userId = UUID.randomUUID().toString();
         user.setUserId(userId);
-        
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoleList(List.of(AppConstants.ROLE_USER));
         return userRepo.save(user);
     }
 
